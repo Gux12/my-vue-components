@@ -20,8 +20,8 @@ let u = url => `${url}`
 // 处理 response
 export function handleResponse (resp) {
   if (!resp.data || resp.data.code !== 0) {
-    // console.warn(resp.config.method, resp.config.url, resp.config.params, resp.config.data, resp.data)
-    // throw resp.data
+    console.warn(resp.config.method, resp.config.url, resp.config.params, resp.config.data, resp.data)
+    throw resp.data
   }
   return resp.data.data
 }
