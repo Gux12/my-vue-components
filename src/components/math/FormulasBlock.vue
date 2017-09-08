@@ -2,12 +2,12 @@
   <div :class="['block', formulas.status]">
     <img :src="formulas.img" alt="" class="resized-img">
     <p>
-      <katex v-if="formulas.status === 'selected'" style="font-size: 2em;color: #eeeeee;" :expr="newlabel"></katex>
-      <katex v-else style="font-size: 2em;color: #eeeeee;" :expr="formulas.result"></katex>
+      <katex class="formulas-display" v-if="formulas.status === 'selected'" :expr="newlabel"></katex>
+      <katex class="formulas-display" v-else :expr="formulas.result"></katex>
     </p>
     <p contenteditable="true">
-      <span v-if="formulas.status === 'selected'" style="font-size: 1em;color: #a4a4a4;">{{newlabel}}</span>
-      <span v-else style="font-size: 1em;color: #a4a4a4;">{{formulas.result}}</span>
+      <span class="origin-text" v-if="formulas.status === 'selected'">{{newlabel}}</span>
+      <span class="origin-text" v-else>{{formulas.result}}</span>
     </p>
   </div>
 </template>
@@ -21,8 +21,7 @@
         display: 'none'
       }
     },
-    methods: {
-    },
+    methods: {},
     mounted () {
     },
     props: [ 'formulas', 'newlabel' ],
@@ -46,8 +45,16 @@
     padding: 5px;
     cursor: pointer;
     border: 2px solid transparent;
+    .formulas-display {
+      font-size: 1.2em;
+      color: #eeeeee;
+    }
+    .origin-text {
+      font-size: 0.8em;
+      color: #a4a4a4;
+    }
     .resized-img {
-      height: 60px;
+      height: 40px;
       display: block;
       margin: auto;
     }

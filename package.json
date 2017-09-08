@@ -14,6 +14,7 @@
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs"
   },
   "dependencies": {
+    "@tweenjs/tween.js": "^17.1.0",
     "axios": "^0.16.2",
     "element-ui": "^1.4.3",
     "lodash": "^4.17.4",

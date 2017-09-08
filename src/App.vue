@@ -10,15 +10,7 @@
          @keydown.ctrl.90.prevent
          @keydown.meta.90.prevent
          tabindex="0">
-      <el-menu class="nav-menu" @open="" @close="" theme="dark" :unique-opened="true" :router="true">
-        <el-submenu index="1">
-          <template slot="title"><i class="el-icon-message"></i>数学标注相关</template>
-          <el-menu-item index="/math">数学公式标注</el-menu-item>
-          <el-menu-item index="1-2">选项2</el-menu-item>
-        </el-submenu>
-        <el-menu-item index="2"><i class="el-icon-menu"></i>导航二</el-menu-item>
-        <el-menu-item index="3"><i class="el-icon-setting"></i>导航三</el-menu-item>
-      </el-menu>
+      <router-view name="header"></router-view>
     </div>
     <el-col class="panel">
       <router-view></router-view>

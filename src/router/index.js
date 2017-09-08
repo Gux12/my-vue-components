@@ -1,27 +1,24 @@
-import concat from 'lodash/concat'
 import Vue from 'vue'
+import concat from 'lodash/concat'
 import Router from 'vue-router'
 import math from './math.js'
-import Hello from '@/components/common/Hello'
-import NotFoundComponent from '@/components/common/NotFoundComponent'
+import common from './common.js'
+import SideBar from '@/components/SideBar'
 
 Vue.use(Router)
 
 export default new Router({
-  routes: concat([
+  routes: [
     {
       path: '/',
-      name: 'Hello',
-      component: Hello
-    },
-    {
-      path: '/NotFoundComponent',
-      name: 'NotFoundComponent',
-      component: NotFoundComponent
-    },
-    {
-      path: '*',
-      redirect: '/NotFoundComponent'
+      components: {
+        default: {
+          name: 'ContentPanel',
+          template: '<router-view></router-view>'
+        },
+        header: SideBar
+      },
+      children: concat(math, common)
     }
-  ], math)
+  ]
 })

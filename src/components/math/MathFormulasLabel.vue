@@ -50,8 +50,8 @@
           <katex :expr="formulasInput.value" click.native.prevent.stop></katex>
         </div>
         <el-tag>{{username}}</el-tag>
-        <el-button type="primary" icon="view" @click.stop="zoom = zoom < 1.5 ? zoom+0.1 : zoom"></el-button>
-        <el-button type="danger" icon="minus" @click.stop="zoom = zoom > 0.5 ? zoom-0.1 : zoom"></el-button>
+        <el-button type="primary" icon="view" @click.stop="zoom = zoom < 1.5 ? zoom+0.1 : zoom;focusInput()"></el-button>
+        <el-button type="danger" icon="minus" @click.stop="zoom = zoom > 0.5 ? zoom-0.1 : zoom;focusInput()"></el-button>
       </el-col>
       <el-col :span="18" class="simstring-wrap">
         <el-radio-group v-model="radio" class="simstring-kind" @change="onSimStringChange">
@@ -171,6 +171,26 @@
           value: '\\therefore',
           display: '\\therefore',
           pos: 10
+        }, {
+          value: '\\ge',
+          display: '\\ge',
+          pos: 3
+        }, {
+          value: '\\neq',
+          display: '\\neq',
+          pos: 4
+        }, {
+          value: '\\le',
+          display: '\\le',
+          pos: 3
+        }, {
+          value: '\\sim',
+          display: '\\sim',
+          pos: 4
+        }, {
+          value: '\\pi',
+          display: '\\pi',
+          pos: 3
         } ],
         historyStack: [],
         costCalc: {
@@ -315,7 +335,7 @@
               time: item.time + 1
             }
             try {
-              if (!data) await formulasSubmit(data)
+              await formulasSubmit(data)
               deleteItem.push(item)
               this.$message.success('提交成功！')
             } catch (e) {
@@ -348,7 +368,7 @@
                 time: item.time + 1
               }
               try {
-                if (!data) await formulasDelete(data)
+                await formulasDelete(data)
                 deleteItem.push(item)
                 this.$message.success('已删除数据')
               } catch (e) {
@@ -474,7 +494,7 @@
   }
 
   .el-textarea__inner {
-    font-size: 2em;
+    font-size: 1.5em;
   }
 
   .workspace {
@@ -500,7 +520,7 @@
         border: 4px solid $color-danger;
         border-radius: 4px;
         text-align: center;
-        font-size: 2em;
+        font-size: 1.5em;
       }
       .simstring-wrap {
         .simstring-kind {

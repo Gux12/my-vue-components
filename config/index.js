@@ -35,10 +35,6 @@ module.exports = {
       '/Data': {
         target: 'http://hw.hexin.im',
         changeOrigin: true
-      },
-      '/simstring': {
-        target: 'http://localhost:7777',
-        changeOrigin: true
       }
     },
     // CSS Sourcemaps off by default because relative paths are "buggy"
