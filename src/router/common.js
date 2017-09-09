@@ -1,5 +1,5 @@
-import NotFoundComponent from '@/components/common/NotFoundComponent'
-import Home from '@/components/common/Home'
+import NotFoundComponent from 'src/components/basic/NotFoundComponent'
+import Home from 'src/components/basic/Home'
 
 export default [
   {

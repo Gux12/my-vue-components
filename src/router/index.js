@@ -3,7 +3,7 @@ import concat from 'lodash/concat'
 import Router from 'vue-router'
 import math from './math.js'
 import common from './common.js'
-import SideBar from '@/components/SideBar'
+import SideBar from 'src/components/basic/SideBar'
 
 Vue.use(Router)
 

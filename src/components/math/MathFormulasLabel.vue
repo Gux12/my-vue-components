@@ -6,7 +6,6 @@
   </div>
   <div class="workspace" v-else>
     <el-row class="utils"
-            :gutter="40"
             @keydown.ctrl.65.prevent="onSelectBlockAll"
             @keydown.meta.65.prevent="onSelectBlockAll"
             @keydown.alt.65.prevent="onSelectBlockNone"
@@ -14,63 +13,76 @@
             @keydown.ctrl.68.native.prevent="onDelete"
             @keydown.meta.90.native.prevent="onRevoke"
             @keydown.ctrl.90.native.prevent="onRevoke"
-            @click.native="focusInput($event,function() {})"
+            @mousedown.native="focusInput"
             tabindex="0">
-      <el-col :span="6">
-        <el-row class="signbar">
+      <el-row class="signbar">
+        <el-col>
           <el-button
             size="small"
             type="normal"
             v-for="item in this.shortcuts"
             @click.native.prevent.stop="onShortCutSelect($event, item)"
             :key="item.value">
-            <katex :expr="item.display"></katex>
+            <MathEditor :value="item.value">
+            </MathEditor>
           </el-button>
-        </el-row>
-        <el-input
-          class="my-autocomplete"
-          type="textarea"
-          autosize
-          :value="formulasInput.value"
-          @input="formulasInput = {value: arguments[0],eventName: 'keydown',selectionStart: arguments[0].length, selectionEnd: arguments[0].length}"
-          placeholder="请输入内容"
-          icon="search"
-          @keyup.native="saveCursorPos($event.target)"
-          @mouseup.native="saveCursorPos($event.target)"
-          @keydown.ctrl.65.native.prevnet="onSelectBlockAll"
-          @keydown.meta.65.native.prevent="onSelectBlockAll"
-          @keydown.alt.65.native.prevent="onSelectBlockNone"
-          @keydown.enter.native.prevent="onSubmit"
-          @click.native.stop
-          autofocus
-          tabindex="0">
-        </el-input>
-        <div class="formulas-preview" click.native.prevent.stop>
-          预览：
-          <katex :expr="formulasInput.value" click.native.prevent.stop></katex>
-        </div>
-        <el-tag>{{username}}</el-tag>
-        <el-button type="primary" icon="view" @click.stop="zoom = zoom < 1.5 ? zoom+0.1 : zoom;focusInput()"></el-button>
-        <el-button type="danger" icon="minus" @click.stop="zoom = zoom > 0.5 ? zoom-0.1 : zoom;focusInput()"></el-button>
-      </el-col>
-      <el-col :span="18" class="simstring-wrap">
-        <el-radio-group v-model="radio" class="simstring-kind" @change="onSimStringChange">
-          <table>
-            <tr v-for="(value, key) in {short:'短公式',middle:'中公式',long:'长公式'}" :key="key">
-              <td><strong style="font-size: 1rem;text-align: right">{{value}}</strong></td>
-              <td>
-                <el-radio-button v-for="(item, index) in simStrings[key]" :key="index" :label="item">
-                  <template>
-                    <div class="el-button el-button--mini">
-                      <katex :expr="item"></katex>
-                    </div>
-                  </template>
-                </el-radio-button>
-              </td>
-            </tr>
-          </table>
-        </el-radio-group>
-      </el-col>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col>
+          <MathEditor
+            ref="MathEditor"
+            type="edit"
+            :value="formulasInput.value"
+            class="MathEditor"
+            @input="formulasInput = {value: arguments[0],eventName: 'keydown'}"
+            placeholder="请输入内容"
+            icon="search"
+            @keydown.ctrl.65.native.stop.prevnet="onSelectBlockAll"
+            @keydown.meta.65.native.stop.prevent="onSelectBlockAll"
+            @keydown.alt.65.native.stop.prevent="onSelectBlockNone"
+            @keydown.ctrl.enter.native.stop.prevent="onSubmit"
+            @keydown.meta.enter.native.stop.prevent="onSubmit"
+            tabindex="0">
+          </MathEditor>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col>
+          <el-radio-group v-model="radio" style="width: 100%" @change="onSimStringChange">
+            <el-table
+              :data="[{type: '短公式',items: 'short'}, {type: '中公式',items: 'middle'}, {type: '长公式',items: 'long'}]"
+              style="width: 100%"
+              :show-header="false">
+              <el-table-column
+                prop="type"
+                label="种类"
+                width="100">
+              </el-table-column>
+              <el-table-column
+                prop="items"
+                label="公式">
+                <template scope="scope">
+                  <el-radio v-for="(item, index) in simStrings[scope.row.items]" :key="index" :label="item">
+                    <template>
+                      <KaTex :expr="item"></KaTex>
+                    </template>
+                  </el-radio>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-radio-group>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col>
+          <el-tag>{{username}}</el-tag>
+          <el-button type="primary" icon="view"
+                     @click.stop="zoom = zoom < 1.5 ? zoom+0.1 : zoom;focusInput()"></el-button>
+          <el-button type="danger" icon="minus"
+                     @click.stop="zoom = zoom > 0.5 ? zoom-0.1 : zoom;focusInput()"></el-button>
+        </el-col>
+      </el-row>
     </el-row>
     <div class="complement"
          @keydown.ctrl.65.prevent="onSelectBlockAll"
@@ -79,8 +91,7 @@
          @selectstart.prevent="onSelectStart"
          @select.prevent="onSelect"
          @mousemove.prevent="onMouseMove"
-         tabindex="-1"
-         @mousedown="onSelectBlockNone">
+         @mousedown.prevent.stop="focusInput">
       <div class="cost">{{ (costCalc.cost / 1000.0).toFixed(1) + 's' }}</div>
       <div class="formulas-block-wrap" :style="{zoom: zoom}">
         <FormulasBlock
@@ -99,12 +110,16 @@
   </div>
 </template>
 <script>
-  import {formulasList, simString, own, formulasSubmit, formulasDelete} from '@/api/math.js'
+  import {formulasList, simString, own, formulasSubmit, formulasDelete} from 'src/api/math.js'
+
   import FormulasBlock from './FormulasBlock.vue'
-  import katex from '../common/KaTex.vue'
-  import GuxInput from '../common/GuxInput.vue'
-  import * as REdetector from '@/utils/REdetector.js'
-  import {start, end} from '@/utils/execution.js'
+  import KaTex from 'src/components/common/KaTex.vue'
+  import GuxInput from 'src/components/common/GuxInput.vue'
+  import MathEditor from 'src/components/common/MathEditor.vue'
+
+  import * as REdetector from 'src/utils/REdetector.js'
+  import {start, end} from 'src/utils/execution.js'
+
   import debounce from 'lodash/debounce'
   import remove from 'lodash/remove'
   import cloneDeep from 'lodash/cloneDeep'
@@ -116,9 +131,7 @@
         formulasList: null,
         formulasInput: {
           value: '',
-          eventName: 'keydown',
-          selectionStart: 0,
-          selectionEnd: 0
+          eventName: 'keydown'
         },
         simStrings: {},
         radio: '',
@@ -196,8 +209,7 @@
         costCalc: {
           cost: 0,
           startTime: new Date().getTime()
-        },
-        input: document.getElementsByClassName('el-textarea__inner')[ 0 ]
+        }
       }
     },
     methods: {
@@ -206,15 +218,6 @@
         this.keydown = false
         this.simStrings = await simString(this.formulasInput.value)
       }, 500),
-      // saveCursorPos: 记录input的光标位置，存在formulasInput的selectionStart和selectionEnd中
-      saveCursorPos (input) {
-        this.formulasInput = {
-          value: this.formulasInput.value,
-          eventName: 'savepos',
-          selectionStart: input.selectionStart,
-          selectionEnd: input.selectionEnd
-        }
-      },
       // onSimStringChange: 当选择simstring时不触发simstring的post更新
       onSimStringChange (e) {
         this.focusInput()
@@ -223,15 +226,7 @@
       // onShortCutSelect: 按住快捷键时，在光标位置处插入转义公式，并且光标移到相应的位置
       onShortCutSelect (e, item) {
         this.focusInput()
-        let input = document.getElementsByClassName('el-textarea__inner')[ 0 ]
-        let res = this.formulasInput.value.slice(0, input.selectionStart) + item.value + this.formulasInput.value.slice(input.selectionEnd, this.formulasInput.length)
-        this.formulasInput.value.slice(input.selectionStart) + item.value
-        this.formulasInput = {
-          value: res,
-          eventName: 'shortcutselect',
-          selectionStart: this.formulasInput.selectionStart + item.pos,
-          selectionEnd: this.formulasInput.selectionEnd + item.pos
-        }
+        this.$refs.MathEditor.insert(item.value)
       },
       onSelectBlock (e, formulas, index) {
         if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return
@@ -255,10 +250,9 @@
           }
         }
         this.blocks.choices_num = this.formulasList.length
-        this.blocks.block_before_shift = -1
+        this.blocks.block_before_shift = 0
         this.blocks.block_current = 0
         this.focusInput()
-        this.changeInput('blockselect')
       },
       onSelectBlockNone (e) {
         for (let item of this.formulasList) item.status = ''
@@ -287,12 +281,10 @@
         }
         this.blocks.choices_num = max - min + 1
         this.focusInput()
-        this.changeInput('blockselect')
       },
       onSelectBlockMetaCtrl (e, formulas, index) {
         if ((REdetector.os.isMac && e.metaKey) || (!REdetector.os.isMac && e.ctrlKey)) {
           this.blocks.block_current = index
-          this.blocks.block_before_shift = index
           if (formulas.status === '') {
             formulas.status = 'selected'
             this.blocks.choices_num++
@@ -302,16 +294,13 @@
           }
         }
         this.focusInput()
-        this.changeInput('blockselect')
       },
       onSelectBlockFirst () {
         this.formulasList[ 0 ].status = 'selected'
         this.focusInput()
         this.formulasInput = {
           value: this.formulasList[ 0 ].result,
-          eventName: 'blockselect',
-          selectionStart: this.formulasList[ 0 ].result.length,
-          selectionEnd: this.formulasList[ 0 ].result.length
+          eventName: 'blockselect'
         }
         this.blocks = {
           choices_num: 1,
@@ -320,41 +309,43 @@
         }
       },
       async onSubmit (e) {
-        let data
-        let deleteItem = []
-        for (let item of this.formulasList) {
-          if (item.status === 'selected') {
-            data = {
-              cost: new Date().getTime() - this.costCalc.startTime,
-              data: {
-                text: item.result,
-                label_text: this.formulasInput.value
-              },
-              dataset_id: 4,
-              id: item.id,
-              time: item.time + 1
-            }
-            try {
-              await formulasSubmit(data)
-              deleteItem.push(item)
-              this.$message.success('提交成功！')
-            } catch (e) {
-              console.error(e)
+        if ((REdetector.os.isMac && e.metaKey) || (!REdetector.os.isMac && e.ctrlKey)) {
+          let data
+          let deleteItem = []
+          for (let item of this.formulasList) {
+            if (item.status === 'selected') {
+              data = {
+                cost: new Date().getTime() - this.costCalc.startTime,
+                data: {
+                  text: item.result,
+                  label_text: this.formulasInput.value
+                },
+                dataset_id: 4,
+                id: item.id,
+                time: item.time + 1
+              }
+              try {
+                await formulasSubmit(data)
+                deleteItem.push(item)
+                this.$message.success('提交成功！')
+              } catch (e) {
+                console.error(e)
+              }
             }
           }
+          this.historyStack.push({ formulasList: cloneDeep(this.formulasList), type: '提交', count: deleteItem.length })
+          remove(this.formulasList, function (n) {
+            return deleteItem.indexOf(n) !== -1
+          })
+          if (this.formulasList.length === 0) {
+            let S = start()
+            this.formulasList = await formulasList()
+            end(S, 'let list = await formulasList()')
+            this.costCalc.cost = 0
+            this.costCalc.startTime = new Date().getTime()
+          }
+          this.onSelectBlockFirst()
         }
-        this.historyStack.push({ formulasList: cloneDeep(this.formulasList), type: '提交', count: deleteItem.length })
-        remove(this.formulasList, function (n) {
-          return deleteItem.indexOf(n) !== -1
-        })
-        if (this.formulasList.length === 0) {
-          let S = start()
-          this.formulasList = await formulasList()
-          end(S, 'let list = await formulasList()')
-          this.costCalc.cost = 0
-          this.costCalc.startTime = new Date().getTime()
-        }
-        this.onSelectBlockFirst()
       },
       async onDelete (e) {
         if ((REdetector.os.isMac && e.metaKey) || (!REdetector.os.isMac && e.ctrlKey)) {
@@ -411,29 +402,22 @@
         }
       },
       focusInput (e) {
-        setTimeout(() => {
-          let input = document.getElementsByClassName('el-textarea__inner')[ 0 ]
-          input.focus()
-          input.selectionStart = this.formulasInput.selectionStart
-          input.selectionEnd = this.formulasInput.selectionEnd
-        }, 0)
+        setTimeout(() => this.$refs[ 'MathEditor' ].focus(), 0)
       },
       changeInput (eventName) {
         if (eventName === 'blockselect') {
-          let value = this.blocks.block_current <= -1 ? '' : this.formulasList[ this.blocks.block_current ].result
-          this.formulasInput = {
-            value: value,
-            eventName: eventName,
-            selectionStart: value.length,
-            selectionEnd: value.length
-          }
+          let value = this.blocks.block_before_shift <= -1 ? '' : this.formulasList[ this.blocks.block_before_shift ].result
+          this.$refs.MathEditor.replace(value)
+//          this.formulasInput = {
+//            value: value,
+//            eventName: eventName
+//          }
         } else if (eventName === 'radioselect') {
-          this.formulasInput = {
-            value: this.radio,
-            eventName: 'radioselect',
-            selectionStart: this.radio.length,
-            selectionEnd: this.radio.length
-          }
+//          this.formulasInput = {
+//            value: this.radio,
+//            eventName: 'radioselect'
+//          }
+          this.$refs.MathEditor.replace(this.radio)
         }
       }
     },
@@ -454,7 +438,7 @@
       }, 100)
     },
     components: {
-      FormulasBlock, katex, GuxInput
+      FormulasBlock, KaTex, GuxInput, MathEditor
     },
     computed: {},
     watch: {
@@ -469,34 +453,16 @@
     }
   }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
   @import "src/scss/color.scss";
 
-  .el-radio-button__inner {
-    font-size: 0.5em;
-    border: 2px solid transparent;
-    padding: 2px;
-    margin: 0 5px 5px 0;
-    transition: none;
+  .el-row {
+    margin-bottom: 20px;
   }
 
-  .el-radio-button {
-    &:first-child .el-radio-button__inner {
-      border-left: none
-    }
+  .el-col {
+    padding: 0 10px 0 10px;
   }
-
-  .el-radio-button__orig-radio:checked + .el-radio-button__inner {
-    box-shadow: none;
-    background-color: transparent;
-    border: 2px solid $color-success;
-    -webkit-border-radius: 4px;
-  }
-
-  .el-textarea__inner {
-    font-size: 1.5em;
-  }
-
   .workspace {
     height: 100vh;
     overflow-x: hidden;
@@ -508,24 +474,9 @@
       &:focus {
         outline: none
       }
-      padding: 20px;
-      flex: none;
+      padding-top: 10px;
       box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-      .signbar {
-        margin: 0 0 10px 0;
-      }
-      .formulas-preview {
-        margin: 10px 0 10px 0;
-        padding: 10px;
-        border: 4px solid $color-danger;
-        border-radius: 4px;
-        text-align: center;
-        font-size: 1.5em;
-      }
-      .simstring-wrap {
-        .simstring-kind {
-          display: block;
-        }
+      .MathEditor {
       }
     }
     .complement {

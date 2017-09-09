@@ -5,7 +5,7 @@
       <katex class="formulas-display" v-if="formulas.status === 'selected'" :expr="newlabel"></katex>
       <katex class="formulas-display" v-else :expr="formulas.result"></katex>
     </p>
-    <p contenteditable="true">
+    <p>
       <span class="origin-text" v-if="formulas.status === 'selected'">{{newlabel}}</span>
       <span class="origin-text" v-else>{{formulas.result}}</span>
     </p>
@@ -33,7 +33,6 @@
 </script>
 <style scoped lang='scss'>
   @import "src/scss/color.scss";
-
   .block {
     display: block;
     float: left;

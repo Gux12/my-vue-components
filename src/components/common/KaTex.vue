@@ -5,7 +5,7 @@
   import 'bower_components/katex/dist/katex.min.css'
   let katex = require('bower_components/katex/dist/katex.min.js')
   export default {
-    name: 'katex',
+    name: 'KaTex',
     replace: true,
     props: {
       expr: {

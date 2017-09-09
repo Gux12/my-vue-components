@@ -4,6 +4,7 @@
     <el-submenu index="1">
       <template slot="title"><i class="el-icon-message"></i>数学标注相关</template>
       <el-menu-item index="/math">数学公式标注</el-menu-item>
+      <el-menu-item index="/math/editor">公式编辑器</el-menu-item>
     </el-submenu>
   </el-menu>
 </template>
