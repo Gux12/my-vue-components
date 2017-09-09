@@ -39,8 +39,8 @@
     box-sizing: border-box;
     box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
     text-align: center;
-    transition: background, border 0.3s, 0.1s;
-    background: #333333;
+    transition: background, border 0.3s, 1s;
+    background: #555555;
     padding: 5px;
     cursor: pointer;
     border: 2px solid transparent;
@@ -74,10 +74,10 @@
     }
     &.selected {
       border: 2px solid $color-success;
-      background: #444444;
+      background: #333333;
     }
     &:hover {
-      background: #555555;
+      background: #333333;
 
     }
   }

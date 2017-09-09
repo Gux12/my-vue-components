@@ -41,8 +41,7 @@
             @keydown.ctrl.65.native.stop.prevnet="onSelectBlockAll"
             @keydown.meta.65.native.stop.prevent="onSelectBlockAll"
             @keydown.alt.65.native.stop.prevent="onSelectBlockNone"
-            @keydown.ctrl.enter.native.stop.prevent="onSubmit"
-            @keydown.meta.enter.native.stop.prevent="onSubmit"
+            @keydown.enter.native.stop.prevent="onSubmit"
             tabindex="0">
           </MathEditor>
         </el-col>
@@ -76,7 +75,7 @@
       </el-row>
       <el-row>
         <el-col>
-          <el-tag>{{username}}</el-tag>
+          <el-tag>{{username}} {{ (costCalc.cost / 1000.0).toFixed(1) + 's' }}</el-tag>
           <el-button type="primary" icon="view"
                      @click.stop="zoom = zoom < 1.5 ? zoom+0.1 : zoom;focusInput()"></el-button>
           <el-button type="danger" icon="minus"
@@ -92,7 +91,6 @@
          @select.prevent="onSelect"
          @mousemove.prevent="onMouseMove"
          @mousedown.prevent.stop="focusInput">
-      <div class="cost">{{ (costCalc.cost / 1000.0).toFixed(1) + 's' }}</div>
       <div class="formulas-block-wrap" :style="{zoom: zoom}">
         <FormulasBlock
           class="formulas-block"
@@ -105,7 +103,6 @@
           :key="formulas.id">
         </FormulasBlock>
       </div>
-      <div class="selector"></div>
     </div>
   </div>
 </template>
@@ -260,6 +257,7 @@
         this.blocks.block_before_shift = -1
         this.blocks.choices_num = 0
         this.focusInput()
+        this.onSelectBlockFirst()
         this.changeInput('blockselect')
       },
       onSelectBlockShift (e, formulas, index) {
@@ -309,43 +307,41 @@
         }
       },
       async onSubmit (e) {
-        if ((REdetector.os.isMac && e.metaKey) || (!REdetector.os.isMac && e.ctrlKey)) {
-          let data
-          let deleteItem = []
-          for (let item of this.formulasList) {
-            if (item.status === 'selected') {
-              data = {
-                cost: new Date().getTime() - this.costCalc.startTime,
-                data: {
-                  text: item.result,
-                  label_text: this.formulasInput.value
-                },
-                dataset_id: 4,
-                id: item.id,
-                time: item.time + 1
-              }
-              try {
-                await formulasSubmit(data)
-                deleteItem.push(item)
-                this.$message.success('提交成功！')
-              } catch (e) {
-                console.error(e)
-              }
+        let data
+        let deleteItem = []
+        for (let item of this.formulasList) {
+          if (item.status === 'selected') {
+            data = {
+              cost: new Date().getTime() - this.costCalc.startTime,
+              data: {
+                text: item.result,
+                label_text: this.formulasInput.value
+              },
+              dataset_id: 4,
+              id: item.id,
+              time: item.time + 1
+            }
+            try {
+              await formulasSubmit(data)
+              deleteItem.push(item)
+              this.$message.success('提交成功！')
+            } catch (e) {
+              console.error(e)
             }
           }
-          this.historyStack.push({ formulasList: cloneDeep(this.formulasList), type: '提交', count: deleteItem.length })
-          remove(this.formulasList, function (n) {
-            return deleteItem.indexOf(n) !== -1
-          })
-          if (this.formulasList.length === 0) {
-            let S = start()
-            this.formulasList = await formulasList()
-            end(S, 'let list = await formulasList()')
-            this.costCalc.cost = 0
-            this.costCalc.startTime = new Date().getTime()
-          }
-          this.onSelectBlockFirst()
         }
+        this.historyStack.push({ formulasList: cloneDeep(this.formulasList), type: '提交', count: deleteItem.length })
+        remove(this.formulasList, function (n) {
+          return deleteItem.indexOf(n) !== -1
+        })
+        if (this.formulasList.length === 0) {
+          let S = start()
+          this.formulasList = await formulasList()
+          end(S, 'let list = await formulasList()')
+          this.costCalc.cost = 0
+          this.costCalc.startTime = new Date().getTime()
+        }
+        this.onSelectBlockFirst()
       },
       async onDelete (e) {
         if ((REdetector.os.isMac && e.metaKey) || (!REdetector.os.isMac && e.ctrlKey)) {
@@ -408,15 +404,7 @@
         if (eventName === 'blockselect') {
           let value = this.blocks.block_before_shift <= -1 ? '' : this.formulasList[ this.blocks.block_before_shift ].result
           this.$refs.MathEditor.replace(value)
-//          this.formulasInput = {
-//            value: value,
-//            eventName: eventName
-//          }
         } else if (eventName === 'radioselect') {
-//          this.formulasInput = {
-//            value: this.radio,
-//            eventName: 'radioselect'
-//          }
           this.$refs.MathEditor.replace(this.radio)
         }
       }
@@ -436,6 +424,9 @@
       setInterval(() => {
         this.costCalc.cost = this.costCalc.cost + 100
       }, 100)
+      this.$nextTick(function () {
+        this.$refs.MathEditor.focus()
+      })
     },
     components: {
       FormulasBlock, KaTex, GuxInput, MathEditor
@@ -457,12 +448,13 @@
   @import "src/scss/color.scss";
 
   .el-row {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
   }
 
   .el-col {
     padding: 0 10px 0 10px;
   }
+
   .workspace {
     height: 100vh;
     overflow-x: hidden;
@@ -474,6 +466,7 @@
       &:focus {
         outline: none
       }
+      margin-bottom: 0;
       padding-top: 10px;
       box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
       .MathEditor {
@@ -484,7 +477,8 @@
       &:focus {
         outline: none
       }
-      padding: 20px;
+      overflow-y: scroll;
+      padding: 10px;
       .formulas-block-wrap {
         display: flex;
         justify-content: flex-start;

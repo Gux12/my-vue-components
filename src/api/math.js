@@ -7,7 +7,7 @@ export let formulasList = async () => {
   //   list.push({ id: item.id, result: item.data.text, img: item.url, time: item.time, status: '' })
   // }
   let list = []
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 100; i++) {
     let sample = {
       id: i.toString(),
       result: i.toString() + '\\times' + i.toString(),
