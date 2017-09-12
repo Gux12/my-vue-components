@@ -38,7 +38,7 @@
                   <MathField :value="MathEditor" @input="onMathEditorInput" type="edit" ref="MathField"></MathField>
                 </div>
                 <el-button size='mini' type="primary"
-                           @click="$refs.MathField.replace('1bm\\\\geqbm-1=3\\\\cdotn=3');$refs.MathField.focus()">
+                           @click="$refs.MathField.replace('\\sum_{am}^IMathEditor');$refs.MathField.focus()">
                   替换还原
                 </el-button>
                 <el-button size='mini' type="primary" @click="$refs.MathField.insert('\\div');$refs.MathField.focus()">
@@ -96,9 +96,8 @@
     },
     methods: {
       onMathEditorInput (e) {
-        console.log(e.latex, e.event)
         this.MathEditor = e.latex
-        this.editType = e.event.editType
+        this.editType = e.editType
       }
     },
     created () {
