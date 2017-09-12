@@ -14,7 +14,6 @@
 </template>
 
 <script>
-  import MathEditor from 'src/components/common/MathEditor.vue'
   function valueToPoint (x, value, index, total) {
 //    let x = 0
     let y = -value * 0.9
@@ -62,9 +61,6 @@
       this.points2 = generatePoints(this.genstats(5))
       this.points3 = generatePoints(this.genstats(4))
       this.points4 = generatePoints(this.genstats(3))
-    },
-    components: {
-      MathEditor
     }
   }
 </script>

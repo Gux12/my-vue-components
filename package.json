@@ -20,6 +20,7 @@
     "lodash": "^4.17.4",
     "mathjax": "^2.7.2",
     "mathquill": "^0.10.1a",
+    "three": "^0.87.1",
     "vue": "^2.4.2",
     "vue-router": "^2.7.0"
   },

@@ -1,20 +1,12 @@
 <template>
   <div id="app"
        class="clearfix">
-    <div class="nav-menu-wrap"
-         @keydown.ctrl.65.prevent
-         @keydown.meta.65.prevent
-         @keydown.alt.65.prevent
-         @keydown.ctrl.68.prevent
-         @keydown.meta.68.prevent
-         @keydown.ctrl.90.prevent
-         @keydown.meta.90.prevent
-         tabindex="0">
+    <div class="nav-menu-wrap">
       <router-view name="header"></router-view>
     </div>
-    <el-col class="panel">
+    <div class="panel">
       <router-view></router-view>
-    </el-col>
+    </div>
   </div>
 </template>
 <script>
@@ -47,8 +39,8 @@
       }
     }
     .panel {
-      position: relative;
-      width: calc(100% - 200px);
+      overflow: hidden;
+      min-height: 100vh;
     }
   }
 </style>

@@ -2,17 +2,17 @@
   <div :class="['block', formulas.status]">
     <img :src="formulas.img" alt="" class="resized-img">
     <p>
-      <katex class="formulas-display" v-if="formulas.status === 'selected'" :expr="newlabel"></katex>
-      <katex class="formulas-display" v-else :expr="formulas.result"></katex>
+      <StaticMath class="formulas-display" v-if="formulas.status === 'selected'" :value="newLabel"></StaticMath>
+      <StaticMath class="formulas-display" v-else :value="formulas.result"></StaticMath>
     </p>
     <p>
-      <span class="origin-text" v-if="formulas.status === 'selected'">{{newlabel}}</span>
+      <span class="origin-text" v-if="formulas.status === 'selected'">{{newLabel}}</span>
       <span class="origin-text" v-else>{{formulas.result}}</span>
     </p>
   </div>
 </template>
 <script>
-  import katex from '../common/KaTex.vue'
+  import StaticMath from '../common/MathEditor/StaticMath.vue'
 
   export default {
     name: 'FormulasBlock',
@@ -24,15 +24,16 @@
     methods: {},
     mounted () {
     },
-    props: [ 'formulas', 'newlabel' ],
+    props: [ 'formulas', 'newLabel' ],
     components: {
-      katex
+      StaticMath
     },
     computed: {}
   }
 </script>
 <style scoped lang='scss'>
   @import "src/scss/color.scss";
+
   .block {
     display: block;
     float: left;

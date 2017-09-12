@@ -11,7 +11,7 @@
     methods: {},
     created () {
     },
-    prop: []
+    props: []
   }
 </script>
 <style scoped lang="scss">
